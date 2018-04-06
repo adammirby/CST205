@@ -1,4 +1,4 @@
-# CST205
+# CST205 - Force IT
 CST205 Group
 
 # Github for dummies
