@@ -1,14 +1,18 @@
+import random
+
+
 class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
-    self.image = makePicture("C://Users//Adam//Desktop//final//map.jpg")
+    self.image = makePicture("/Users/francois/cst205/map.jpg")
   
-  def updateMap(self, player):
+  def updateMap(self, player, item):
+    addRectFilled(self.image, item.xPos, item.yPos, 10, 10, yellow)
     loc = player.getLastLocation()
-    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), makeColor(white))
+    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), white)
     loc = player.getPlayerLocation()
-    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), makeColor(red))
+    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
     repaint(self.image)
     
   #Code to get rid of the key after player and key have shared locations
@@ -46,11 +50,11 @@ class Map:
           valid = False
     return valid
   
-import random
 #TODO: add inventory local variable
 #TODO: add getItem(item) to add to players inventory
 #TODO: add hasItem() function to report if player has key
 #TODO: add turn variable and modification functions to keep track of number of moves remaining
+
 
 class Player:
   location = [None, None]  #keeps track of current location of player in [x, y]
@@ -62,12 +66,12 @@ class Player:
   #DONE: take map as paramater to see if random starting location is a valid location?
   def __init__(self, map):
     self.size = 10
-    locationX = random.randrange(map.returnWidth())     #possibly use map functions that return map dimensions?
-    locationY = random.randrange(map.returnHeight())  #possibly use map functions that return map dimensions?
+    locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
+    locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18  #possibly use map functions that return map dimensions?
     while map.isValidLocation(locationX, locationY, self.size) == False:
-      locationX = random.randrange(map.returnWidth())
-      locationY = random.randrange(map.returnWidth())
-    self.location[0] = locationX
+      locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18 
+      locationY = random.randrange(map.returnWidth()) / 36 * 36 + 18 
+    self.location[0] = locationX 
     self.location[1] = locationY
     self.lastLocation[0] = locationX
     self.lastLocation[1] = locationY
@@ -79,16 +83,16 @@ class Player:
     self.lastLocation[0] = self.location[0]
     self.lastLocation[1] = self.location[1] 
     
-    stepCount = steps * self.size
-    for i in range (0, stepCount):
-      if direction == 'r' and map.isValidLocation(self.location[0] + 2, self.location[1], self.size):
-        self.location[0] += 1
-      elif direction == 'l' and map.isValidLocation(self.location[0] - 2, self.location[1], self.size):
-        self.location[0] -= 1
-      elif direction == 'u' and map.isValidLocation(self.location[0], self.location[1] - 2, self.size):
-        self.location[1] -= 1
-      elif direction == 'd' and map.isValidLocation(self.location[0], self.location[1] + 2, self.size):
-        self.location[1] += 1
+    for i in range (0, steps):
+      if direction == 'r' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
+        self.location[0] += 18
+      elif direction == 'l' and map.isValidLocation(self.location[0] - 18, self.location[1], self.size):
+        self.location[0] -= 18
+      elif direction == 'u' and map.isValidLocation(self.location[0], self.location[1] - 18, self.size):
+        self.location[1] -= 18
+      elif direction == 'd' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
+        self.location[1] += 18
+      
       
   #returns current location of player as a list, index 0 is x, index 1 is y
   def getPlayerLocation(self):
@@ -101,12 +105,41 @@ class Player:
     
   def getSize(self):
     return self.size
+    
+  def hasKey(self):
+    self.hasKey = True
+
+
+class Item:
+  # Initializer - requires a name and set x and y to 0
+  def __init__(self, name):
+    self.name = name
+    self.xPos = random.randint(0, 623) / 36 * 36 + 18
+    self.yPos = random.randint(0, 623) / 36 * 36 + 18
+
+  # Set x and y position
+  def setPosition(self, x, y):
+    self.xPos = x / 36 * 36 + 18
+    self.yPos = y / 36 * 36 + 18
+
+  # Return x and y position as a list
+  def getPosition(self):
+    return [self.xPos, self.yPos]
+
 
 def main():
   map = Map(624, 624)
+  item = Item('key')
   player = Player(map)
+  
   while(True):
-    map.updateMap(player)
+    map.updateMap(player, item)
     direction = requestString("Direction?")
-    direction = direction.split()
+    direction = direction.split() 
+    
     player.movePlayer(map, direction[0], int(direction[1]))
+    if item.xPos == player.location[0] and item.yPos == player.location[1]:
+      showInformation("You picked up a key.")
+
+
+main()
