@@ -5,7 +5,6 @@ class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
-      player_has_item
     self.image = makePicture("/Users/francois/cst205/map.jpg")
 
   def updateMap(self, player, item):
@@ -164,9 +163,7 @@ def main():
       inputBad = True
       numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
       player.movePlayer(map, direction, numOfSteps)
-      if item.xPos == player.location[0] and item.yPos == player.location[1]:
-        showInformation("You picked up a key.")
-
+  
   showInformation("Thank you for playing!")
   
 
