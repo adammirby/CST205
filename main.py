@@ -6,13 +6,20 @@ class Map:
     self.width = width
     self.height = height
     self.image = makePicture("/Users/francois/cst205/map.jpg")
-  
+
   def updateMap(self, player, item):
-    addRectFilled(self.image, item.xPos, item.yPos, 10, 10, yellow)
+    if not player.hasItem:  # Draw key if player does not have key
+      addRectFilled(self.image, item.xPos, item.yPos, 10, 10, yellow)
+
     loc = player.getLastLocation()
     addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), white)
+
     loc = player.getPlayerLocation()
-    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
+    if player.hasItem:  # Player is red without key, green with key
+      addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), green)
+    else:
+      addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
+
     repaint(self.image)
     
   #Code to get rid of the key after player and key have shared locations
@@ -60,7 +67,8 @@ class Player:
   location = [None, None]  #keeps track of current location of player in [x, y]
   lastLocation = [None, None] #keeps track of last location to be used by update to "undraw" last location
   size = None
-  
+  hasItem = None
+
   #initializes plays location to hard coded value
   #DONE: change to random starting locaiton
   #DONE: take map as paramater to see if random starting location is a valid location?
@@ -68,21 +76,24 @@ class Player:
     self.size = 10
     locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
     locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18  #possibly use map functions that return map dimensions?
+
     while map.isValidLocation(locationX, locationY, self.size) == False:
       locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18 
       locationY = random.randrange(map.returnWidth()) / 36 * 36 + 18 
+
     self.location[0] = locationX 
     self.location[1] = locationY
     self.lastLocation[0] = locationX
     self.lastLocation[1] = locationY
-    
+    hasItem = False
+
   #takes a direction to move the player
   #TODO: determine how far to move player, set distance? let player decide?
   #TODO: needs to check if new location is valid, map class funciton? take map as paramater?
   def movePlayer(self, map, direction, steps):
     self.lastLocation[0] = self.location[0]
-    self.lastLocation[1] = self.location[1] 
-    
+    self.lastLocation[1] = self.location[1]
+
     for i in range (0, steps):
       if direction == 'r' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
         self.location[0] += 18
@@ -92,22 +103,22 @@ class Player:
         self.location[1] -= 18
       elif direction == 'd' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
         self.location[1] += 18
-      
-      
+
+
   #returns current location of player as a list, index 0 is x, index 1 is y
   def getPlayerLocation(self):
     return self.location
-    
+
   #returns last locaiton of player as a list, index 0 is x, index 1 is y
   #this can be used by the map function to redraw last location back to background color
   def getLastLocation(self):
     return self.lastLocation
-    
+
   def getSize(self):
     return self.size
-    
-  def hasKey(self):
-    self.hasKey = True
+
+  def pickUpItem(self):
+    self.hasItem = True
 
 
 class Item:
@@ -133,13 +144,17 @@ def main():
   player = Player(map)
   
   while(True):
-    map.updateMap(player, item)
+    if item.xPos == player.location[0] and item.yPos == player.location[1] and not player.hasItem:
+      player.pickUpItem()
+      map.updateMap(player, item)
+      showInformation("You picked up a key.")
+    else:  
+      map.updateMap(player, item)
+    
     direction = requestString("Direction?")
     direction = direction.split() 
     
     player.movePlayer(map, direction[0], int(direction[1]))
-    if item.xPos == player.location[0] and item.yPos == player.location[1]:
-      showInformation("You picked up a key.")
-
+    
 
 main()
