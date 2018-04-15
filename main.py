@@ -5,15 +5,22 @@ class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
-    #self.image = makePicture("/Users/francois/cst205/map.jpg")
-    self.image = makePicture("C://Users//Adam//Desktop//final//CST205//map.jpg")
-    
+      player_has_item
+    self.image = makePicture("/Users/francois/cst205/map.jpg")
+
   def updateMap(self, player, item):
-    addRectFilled(self.image, item.xPos, item.yPos, 10, 10, yellow)
+    if not player.hasItem:  # Draw key if player does not have key
+      addRectFilled(self.image, item.xPos, item.yPos, 10, 10, yellow)
+
     loc = player.getLastLocation()
     addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), white)
+
     loc = player.getPlayerLocation()
-    addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
+    if player.hasItem:  # Player is red without key, green with key
+      addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), green)
+    else:
+      addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
+
     repaint(self.image)
     
   #Code to get rid of the key after player and key have shared locations
@@ -61,25 +68,29 @@ class Player:
   location = [None, None]  #keeps track of current location of player in [x, y]
   lastLocation = [None, None] #keeps track of last location to be used by update to "undraw" last location
   size = None
+  hasItem = None
   
   #initializes plays location random starting location
   def __init__(self, map):
     self.size = 10
     locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
     locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18  #possibly use map functions that return map dimensions?
+
     while map.isValidLocation(locationX, locationY, self.size) == False:
       locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18 
       locationY = random.randrange(map.returnWidth()) / 36 * 36 + 18 
+
     self.location[0] = locationX 
     self.location[1] = locationY
     self.lastLocation[0] = locationX
     self.lastLocation[1] = locationY
+    hasItem = False
     
   #takes a direction and number of steps to move
   def movePlayer(self, map, direction, steps):
     self.lastLocation[0] = self.location[0]
-    self.lastLocation[1] = self.location[1] 
-    
+    self.lastLocation[1] = self.location[1]
+
     for i in range (0, steps):
       if direction == 'right' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
         self.location[0] += 18
@@ -89,22 +100,21 @@ class Player:
         self.location[1] -= 18
       elif direction == 'down' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
         self.location[1] += 18
-      
-      
+
   #returns current location of player as a list, index 0 is x, index 1 is y
   def getPlayerLocation(self):
     return self.location
-    
+
   #returns last locaiton of player as a list, index 0 is x, index 1 is y
   #this can be used by the map function to redraw last location back to background color
   def getLastLocation(self):
     return self.lastLocation
-    
+
   def getSize(self):
     return self.size
-    
-  def hasKey(self):
-    self.hasKey = True
+
+  def pickUpItem(self):
+    self.hasItem = True
 
 
 class Item:
@@ -124,22 +134,22 @@ class Item:
     return [self.xPos, self.yPos]
 
 
-
-def displayIntro():
-  showInformation("You are trapped in a maze! To get out you will have to find the key and get to the exit!"+
-                  " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
-                  "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
-                  " leave through the brown door that leads to freedom! Good Luck!")
 def main():
   map = Map(624, 624)
-  item = Item('key')
+  key = Item('key')
   player = Player(map)
   inputBad = True
   displayIntro()
   playing = True
   
   while(playing):
-    map.updateMap(player, item)
+    if key.xPos == player.location[0] and key.yPos == player.location[1] and not player.hasItem:
+      player.pickUpItem()
+      map.updateMap(player, key)
+      showInformation("You picked up a key.")
+    else:  
+      map.updateMap(player, key)
+      
     while inputBad:
       direction = requestString("                 What direction would you like to move? \n                               Up, Down, Left, or Right \n(Type \'help\' to see the intro again, or \'exit\' to quit the game)") #this is spaced weirdly to try to center text
       direction = direction.lower()
@@ -158,5 +168,13 @@ def main():
         showInformation("You picked up a key.")
 
   showInformation("Thank you for playing!")
+  
 
+def displayIntro():
+  showInformation("You are trapped in a maze! To get out you will have to find the key and get to the exit!"+
+                  " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
+                  "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
+                  " leave through the brown door that leads to freedom! Good Luck!")
+
+  
 main()
