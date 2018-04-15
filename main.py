@@ -5,6 +5,7 @@ class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
+      player_has_item
     self.image = makePicture("/Users/francois/cst205/map.jpg")
 
   def updateMap(self, player, item):
@@ -68,10 +69,8 @@ class Player:
   lastLocation = [None, None] #keeps track of last location to be used by update to "undraw" last location
   size = None
   hasItem = None
-
-  #initializes plays location to hard coded value
-  #DONE: change to random starting locaiton
-  #DONE: take map as paramater to see if random starting location is a valid location?
+  
+  #initializes plays location random starting location
   def __init__(self, map):
     self.size = 10
     locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
@@ -86,24 +85,21 @@ class Player:
     self.lastLocation[0] = locationX
     self.lastLocation[1] = locationY
     hasItem = False
-
-  #takes a direction to move the player
-  #TODO: determine how far to move player, set distance? let player decide?
-  #TODO: needs to check if new location is valid, map class funciton? take map as paramater?
+    
+  #takes a direction and number of steps to move
   def movePlayer(self, map, direction, steps):
     self.lastLocation[0] = self.location[0]
     self.lastLocation[1] = self.location[1]
 
     for i in range (0, steps):
-      if direction == 'r' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
+      if direction == 'right' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
         self.location[0] += 18
-      elif direction == 'l' and map.isValidLocation(self.location[0] - 18, self.location[1], self.size):
+      elif direction == 'left' and map.isValidLocation(self.location[0] - 18, self.location[1], self.size):
         self.location[0] -= 18
-      elif direction == 'u' and map.isValidLocation(self.location[0], self.location[1] - 18, self.size):
+      elif direction == 'up' and map.isValidLocation(self.location[0], self.location[1] - 18, self.size):
         self.location[1] -= 18
-      elif direction == 'd' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
+      elif direction == 'down' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
         self.location[1] += 18
-
 
   #returns current location of player as a list, index 0 is x, index 1 is y
   def getPlayerLocation(self):
@@ -142,19 +138,43 @@ def main():
   map = Map(624, 624)
   key = Item('key')
   player = Player(map)
+  inputBad = True
+  displayIntro()
+  playing = True
   
-  while(True):
+  while(playing):
     if key.xPos == player.location[0] and key.yPos == player.location[1] and not player.hasItem:
       player.pickUpItem()
       map.updateMap(player, key)
       showInformation("You picked up a key.")
     else:  
       map.updateMap(player, key)
-    
-    direction = requestString("Direction?")
-    direction = direction.split() 
-    
-    player.movePlayer(map, direction[0], int(direction[1]))
-    
+      
+    while inputBad:
+      direction = requestString("                 What direction would you like to move? \n                               Up, Down, Left, or Right \n(Type \'help\' to see the intro again, or \'exit\' to quit the game)") #this is spaced weirdly to try to center text
+      direction = direction.lower()
+      if direction == 'help':
+        displayIntro()
+      elif direction == 'exit':
+        playing = False
+        break
+      if direction == "up" or direction == "down" or direction == "left" or direction == "right":
+        inputBad = False
+    else:
+      inputBad = True
+      numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
+      player.movePlayer(map, direction, numOfSteps)
+      if item.xPos == player.location[0] and item.yPos == player.location[1]:
+        showInformation("You picked up a key.")
 
+  showInformation("Thank you for playing!")
+  
+
+def displayIntro():
+  showInformation("You are trapped in a maze! To get out you will have to find the key and get to the exit!"+
+                  " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
+                  "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
+                  " leave through the brown door that leads to freedom! Good Luck!")
+
+  
 main()
