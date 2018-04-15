@@ -140,16 +140,16 @@ class Item:
 
 def main():
   map = Map(624, 624)
-  item = Item('key')
+  key = Item('key')
   player = Player(map)
   
   while(True):
-    if item.xPos == player.location[0] and item.yPos == player.location[1] and not player.hasItem:
+    if key.xPos == player.location[0] and key.yPos == player.location[1] and not player.hasItem:
       player.pickUpItem()
-      map.updateMap(player, item)
+      map.updateMap(player, key)
       showInformation("You picked up a key.")
     else:  
-      map.updateMap(player, item)
+      map.updateMap(player, key)
     
     direction = requestString("Direction?")
     direction = direction.split() 
