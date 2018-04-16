@@ -5,7 +5,8 @@ class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
-    self.image = makePicture("/Users/francois/cst205/map.jpg")
+    self.image = makePicture("C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map.png")
+    self.exitLoc = [306, 612]
 
   def updateMap(self, player, item):
     if not player.hasItem:  # Draw key if player does not have key
@@ -43,18 +44,21 @@ class Map:
   def returnHeight(self):
     return self.height
   
-  def isValidLocation(self, x, y, size):
+  def isValidLocation(self, x, y, size, hasItem):
     if x + size > self.width or y + size > self.height:
       valid = False
     else:
       valid = True
-      
     if valid:
       corners = [[x, y],[x + size + 1, y],[x, y + size + 1],[x + size + 1, y + size + 1]]
       for corner in corners:
         pix = getPixelAt(self.image, corner[0], corner[1])
-        if(getColor(pix) == black):
+        if(getColor(pix) == black or getColor(pix) == makeColor(137,70, 17)):
           valid = False
+      if(self.exitLoc[0] == x and self.exitLoc[1] == y and hasItem == False):
+        valid = False
+      elif(self.exitLoc[0] == x and self.exitLoc[1] == y and hasItem == True):
+        valid = True
     return valid
   
 #TODO: add inventory local variable
@@ -72,10 +76,11 @@ class Player:
   #initializes plays location random starting location
   def __init__(self, map):
     self.size = 10
+    self.hasItem = False
     locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
     locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18  #possibly use map functions that return map dimensions?
 
-    while map.isValidLocation(locationX, locationY, self.size) == False:
+    while map.isValidLocation(locationX, locationY, self.size, self.hasItem) == False:
       locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18 
       locationY = random.randrange(map.returnWidth()) / 36 * 36 + 18 
 
@@ -91,13 +96,13 @@ class Player:
     self.lastLocation[1] = self.location[1]
 
     for i in range (0, steps):
-      if direction == 'right' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size):
+      if direction == 'right' and map.isValidLocation(self.location[0] + 18, self.location[1], self.size, self.hasItem):
         self.location[0] += 18
-      elif direction == 'left' and map.isValidLocation(self.location[0] - 18, self.location[1], self.size):
+      elif direction == 'left' and map.isValidLocation(self.location[0] - 18, self.location[1], self.size, self.hasItem):
         self.location[0] -= 18
-      elif direction == 'up' and map.isValidLocation(self.location[0], self.location[1] - 18, self.size):
+      elif direction == 'up' and map.isValidLocation(self.location[0], self.location[1] - 18, self.size, self.hasItem):
         self.location[1] -= 18
-      elif direction == 'down' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size):
+      elif direction == 'down' and map.isValidLocation(self.location[0], self.location[1] + 18, self.size, self.hasItem):
         self.location[1] += 18
 
   #returns current location of player as a list, index 0 is x, index 1 is y
@@ -163,11 +168,11 @@ def main():
       inputBad = True
       numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
       player.movePlayer(map, direction, numOfSteps)
-      if player.getPlayerLocation() == [306, 594] and player.hasItem:
-        showInformation("You found the exit!")
+      if player.getPlayerLocation() == [306, 612] and player.hasItem:
         playing = False
         break
-  
+  map.updateMap(player, key)
+  showInformation("You used the key and escaped!")
   showInformation("Thank you for playing!")
   
 
@@ -176,6 +181,9 @@ def displayIntro():
                   " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
                   "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
                   " leave through the brown door that leads to freedom! Good Luck!")
-
-  
-main()
+                  
+def editMap():
+  map = makePicture("C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map2.jpg")
+  addRectFilled(map, 300,612, 24, 12, makeColor(139, 69, 19))
+  writePictureTo(map, "C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map3.png")
+  explore(map)
