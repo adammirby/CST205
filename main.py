@@ -163,6 +163,10 @@ def main():
       inputBad = True
       numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
       player.movePlayer(map, direction, numOfSteps)
+      if player.getPlayerLocation() == [306, 594] and player.hasItem:
+        showInformation("You found the exit!")
+        playing = False
+        break
   
   showInformation("Thank you for playing!")
   
