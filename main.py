@@ -152,7 +152,11 @@ def main():
       map.updateMap(player, key)
       
     while inputBad:
-      direction = requestString("                 What direction would you like to move? \n                               Up, Down, Left, or Right \n(Type \'help\' to see the intro again, or \'exit\' to quit the game)") #this is spaced weirdly to try to center text
+      direction = requestString(
+        "                 What direction would you like to move? \n"
+        "                               Up, Down, Left, or Right \n"
+        "(Type \'help\' to see the intro again, or \'exit\' to quit the game)")
+      
       direction = direction.lower()
       if direction == 'help':
         displayIntro()
@@ -164,7 +168,9 @@ def main():
         inputBad = False
     else:
       inputBad = True
-      numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
+      numOfSteps = requestIntegerInRange(
+        "Enter the number of steps you would like to move in that direction. \n"
+        "                   Number can be be in the range of 1-10", 1, 10) 
       player.movePlayer(map, direction, numOfSteps)
       if player.getPlayerLocation() == map.exitLoc and player.hasItem:
         playing = False
