@@ -22,21 +22,6 @@ class Map:
       addRectFilled(self.image, loc[0], loc[1], player.getSize(), player.getSize(), red)
 
     repaint(self.image)
-    
-  #Code to get rid of the key after player and key have shared locations
-  #Possibly in key class have color attribute (boolean) yellow if player.hasKey
-  #is false, white is player.hasKey is true
-  
-  #def displayKey(location, player.hasItem):
-    #Default value for color should be False/yellow
-    #This will depend on how item class works
-    #Or I can handle it here
-    #if(player.hasItem == true):
-    
-    
-  #Funtions that Adam needs
-  #getLastLocation() needs to recolor the old player white return a list with 2 indices 0=x, 1=y
-  #getPlayerLocation() needs to redraw the player in new location return a list with 2 indices 0=x, 1=y
   
   def returnWidth(self):
     return self.width
@@ -60,12 +45,6 @@ class Map:
       elif(self.exitLoc[0] == x and self.exitLoc[1] == y and hasItem == True):
         valid = True
     return valid
-  
-#TODO: add inventory local variable
-#TODO: add getItem(item) to add to players inventory
-#TODO: add hasItem() function to report if player has key
-#TODO: add turn variable and modification functions to keep track of number of moves remaining
-
 
 class Player:
   location = [None, None]  #keeps track of current location of player in [x, y]
@@ -77,8 +56,8 @@ class Player:
   def __init__(self, map):
     self.size = 10
     self.hasItem = False
-    locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18    #possibly use map functions that return map dimensions?
-    locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18  #possibly use map functions that return map dimensions?
+    locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18
+    locationY = random.randrange(map.returnHeight()) / 36 * 36 + 18
 
     while map.isValidLocation(locationX, locationY, self.size, self.hasItem) == False:
       locationX = random.randrange(map.returnWidth()) / 36 * 36 + 18 
@@ -125,8 +104,8 @@ class Item:
   # Initializer - requires a name and set x and y to 0
   def __init__(self, name):
     self.name = name
-    self.xPos = random.randint(0, 623) / 36 * 36 + 18
-    self.yPos = random.randint(0, 623) / 36 * 36 + 18
+    self.xPos = random.randint(0, 594) / 36 * 36 + 18
+    self.yPos = random.randint(0, 594) / 36 * 36 + 18
 
   # Set x and y position
   def setPosition(self, x, y):
@@ -137,11 +116,20 @@ class Item:
   def getPosition(self):
     return [self.xPos, self.yPos]
 
+def displayIntro():
+  showInformation("You are trapped in a maze! To get out you will have to find the key and get to the exit!"+
+                  " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
+                  "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
+                  " leave through the brown door that leads to freedom! Good Luck!")
 
 def main():
   map = Map(624, 624)
   key = Item('key')
   player = Player(map)
+  
+  while key.xPos == player.location[0] and key.yPos == player.location[1]:
+    key = Item('key')
+  
   inputBad = True
   displayIntro()
   playing = True
@@ -160,6 +148,7 @@ def main():
       if direction == 'help':
         displayIntro()
       elif direction == 'exit':
+        showInformation("Goodbye.")
         playing = False
         break
       if direction == "up" or direction == "down" or direction == "left" or direction == "right":
@@ -168,22 +157,9 @@ def main():
       inputBad = True
       numOfSteps = requestIntegerInRange("Enter the number of steps you would like to move in that direction. \n                   Number can be be in the range of 1-10", 1, 10)  #this is spaced weirdly to try to center text
       player.movePlayer(map, direction, numOfSteps)
-      if player.getPlayerLocation() == [306, 612] and player.hasItem:
+      if player.getPlayerLocation() == map.exitLoc and player.hasItem:
         playing = False
+        map.updateMap(player, key)
+        showInformation("You used the key and escaped!")
+        showInformation("Thank you for playing!")
         break
-  map.updateMap(player, key)
-  showInformation("You used the key and escaped!")
-  showInformation("Thank you for playing!")
-  
-
-def displayIntro():
-  showInformation("You are trapped in a maze! To get out you will have to find the key and get to the exit!"+
-                  " You are the red square, you will be asked for the direction you would like to go (up, down, left, or right),"+ 
-                  "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
-                  " leave through the brown door that leads to freedom! Good Luck!")
-                  
-def editMap():
-  map = makePicture("C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map2.jpg")
-  addRectFilled(map, 300,612, 24, 12, makeColor(139, 69, 19))
-  writePictureTo(map, "C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map3.png")
-  explore(map)
