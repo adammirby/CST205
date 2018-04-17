@@ -1,3 +1,7 @@
+# Team: ForceIT (Blaze King, Adam Irby, Lawerence Shea, Francois Tcha)
+# CST 205
+# Final Project - Da Maze
+
 import random
 
 
@@ -45,6 +49,7 @@ class Map:
       elif(self.exitLoc[0] == x and self.exitLoc[1] == y and hasItem == True):
         valid = True
     return valid
+
 
 class Player:
   location = [None, None]  #keeps track of current location of player in [x, y]
@@ -122,11 +127,13 @@ def displayIntro():
                   "and how many steps you would like to take in that direction. You have to grab the yellow key before you can"+
                   " leave through the brown door that leads to freedom! Good Luck!")
 
+
 def main():
   map = Map(624, 624)
   key = Item('key')
   player = Player(map)
   
+  # Validate key and player position. If match relocate key.
   while key.xPos == player.location[0] and key.yPos == player.location[1]:
     key = Item('key')
   
