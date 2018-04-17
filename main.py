@@ -9,8 +9,10 @@ class Map:
   def __init__(self, width, height):
     self.width = width
     self.height = height
-    self.image = makePicture("C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map.png")
     self.exitLoc = [306, 612]
+    
+    #####  Update image path  #####
+    self.image = makePicture("C://Users//admin//Documents//School//CSUMB//2018//CST205//Module 7//Final Project//map.png")
 
   def updateMap(self, player, item):
     if not player.hasItem:  # Draw key if player does not have key
